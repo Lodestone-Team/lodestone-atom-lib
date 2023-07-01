@@ -54,6 +54,7 @@ export default class TestInstance extends Atom.AtomInstance {
     }
     public async stop(caused_by: Atom.CausedBy, block: boolean): Promise<void> {
         console.log("stop");
+        this._state = "Stopped";
         this.event_stream.emitStateChange("Stopped");
         return;
     }
