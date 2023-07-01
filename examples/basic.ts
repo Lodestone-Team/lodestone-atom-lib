@@ -97,8 +97,31 @@ export default class TestInstance extends Atom.AtomInstance {
     public monitor(): Promise<Atom.PerformanceReport> {
         throw new Error("Method not implemented.");
     }
-    public configurableManifest(): Promise<Atom.ConfigurableManifest> {
-        throw new Error("Method not implemented.");
+    public async configurableManifest(): Promise<Atom.ConfigurableManifest> {
+        return {
+            auto_start: false,
+            restart_on_crash: false,
+            setting_sections: {
+                "section_id1": {
+                    section_id: "section_id1",
+                    name: "First Section",
+                    description: "This is the first section",
+                    settings: {
+                        "setting_id1": {
+                            setting_id: "setting_id1",
+                            name: "Port",
+                            description: "Port to run the server on",
+                            value: { type: "UnsignedInteger", value: this.config.port },
+                            value_type: { type: "UnsignedInteger", min: 0, max: 65535 },
+                            default_value: { type: "UnsignedInteger", value: 6969 },
+                            is_secret: false,
+                            is_required: true,
+                            is_mutable: true,
+                        }
+                    },
+                }
+            }
+        }
     }
     public async name(): Promise<string> {
         return this.config.name;
