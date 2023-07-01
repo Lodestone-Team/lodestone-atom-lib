@@ -16,7 +16,7 @@ export default class TestInstance extends Atom.AtomInstance {
     public async setupManifest(): Promise<Atom.SetupManifest> {
         return {
             setting_sections: {
-                "test": {
+                "section_id1": {
                     section_id: "section_id1",
                     name: "section_name1",
                     description: "section_description1",
