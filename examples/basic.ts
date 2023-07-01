@@ -27,7 +27,7 @@ export default class TestInstance extends Atom.AtomInstance {
                             description: "Port to run the server on",
                             value: null,
                             value_type: { type: "UnsignedInteger", min: 0, max: 65535 },
-                            default_value: { type: "UnsignedInteger", value: 25565 },
+                            default_value: { type: "UnsignedInteger", value: 6969 },
                             is_secret: false,
                             is_required: true,
                             is_mutable: true,
@@ -39,13 +39,18 @@ export default class TestInstance extends Atom.AtomInstance {
     }
     public async setup(setupValue: Atom.SetupValue, dotLodestoneConfig: Atom.DotLodestoneConfig, path: string): Promise<void> {
         this.uuid = dotLodestoneConfig.uuid;
-        this.config.name = setupValue.name;
-        this.config.description = setupValue.description || "";
+        let port: number;
         if (setupValue.setting_sections["setting_id1"].settings["setting_id1"].value?.type == "UnsignedInteger") {
-            this.config.port = setupValue.setting_sections["setting_id1"].settings["setting_id1"].value.value;
+            port = setupValue.setting_sections["setting_id1"].settings["setting_id1"].value.value;
         } else {
             throw new Error("Invalid value type");
         }
+        this.config = {
+            name: setupValue.name,
+            description: setupValue.description ?? "",
+            port: port,
+        };
+
         // write config to file
         await Deno.writeTextFile(path + "/" + TestInstance.restoreConfigName, JSON.stringify(this.config));
 
