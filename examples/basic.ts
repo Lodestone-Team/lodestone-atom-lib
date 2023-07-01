@@ -1,11 +1,18 @@
 import * as Atom from "https://raw.githubusercontent.com/Lodestone-Team/lodestone-atom-lib/main/mod.ts";
 
 import { EventStream } from "https://raw.githubusercontent.com/Lodestone-Team/lodestone-macro-lib/main/events.ts";
-
+interface RestoreConfig {
+    name: string;
+    description: string;
+    port: number;
+}
 export default class TestInstance extends Atom.AtomInstance {
     uuid!: string;
     _state: Atom.InstanceState = "Stopped";
+    path!: string;
     event_stream!: EventStream;
+    config!: RestoreConfig;
+    static restoreConfigName = "restore.json";
     public async setupManifest(): Promise<Atom.SetupManifest> {
         return {
             setting_sections: {
@@ -16,11 +23,11 @@ export default class TestInstance extends Atom.AtomInstance {
                     settings: {
                         "setting_id1": {
                             setting_id: "setting_id1",
-                            name: "setting_name1",
-                            description: "setting_description1",
+                            name: "Port",
+                            description: "Port to run the server on",
                             value: null,
-                            value_type: { type: "String", regex: null },
-                            default_value: null,
+                            value_type: { type: "UnsignedInteger", min: 0, max: 65535 },
+                            default_value: { type: "UnsignedInteger", value: 25565 },
                             is_secret: false,
                             is_required: true,
                             is_mutable: true,
@@ -32,12 +39,24 @@ export default class TestInstance extends Atom.AtomInstance {
     }
     public async setup(setupValue: Atom.SetupValue, dotLodestoneConfig: Atom.DotLodestoneConfig, path: string): Promise<void> {
         this.uuid = dotLodestoneConfig.uuid;
-        this.event_stream = new EventStream(this.uuid, "test_im_in_ts");
+        this.config.name = setupValue.name;
+        this.config.description = setupValue.description || "";
+        if (setupValue.setting_sections["setting_id1"].settings["setting_id1"].value?.type == "UnsignedInteger") {
+            this.config.port = setupValue.setting_sections["setting_id1"].settings["setting_id1"].value.value;
+        } else {
+            throw new Error("Invalid value type");
+        }
+        // write config to file
+        await Deno.writeTextFile(path + "/" + TestInstance.restoreConfigName, JSON.stringify(this.config));
+
+        this.event_stream = new EventStream(this.uuid, this.config.name);
+
         return;
     }
     public async restore(dotLodestoneConfig: Atom.DotLodestoneConfig, path: string): Promise<void> {
         this.uuid = dotLodestoneConfig.uuid;
-        this.event_stream = new EventStream(this.uuid, "test_im_in_ts");
+        this.event_stream = new EventStream(this.uuid, this.config.name);
+        this.config = JSON.parse(await Deno.readTextFile(path + "/" + TestInstance.restoreConfigName)) as RestoreConfig;
         return;
     }
     public async start(caused_by: Atom.CausedBy, block: boolean): Promise<void> {
@@ -65,10 +84,10 @@ export default class TestInstance extends Atom.AtomInstance {
         throw new Error("Method not implemented.");
     }
     public async state(): Promise<Atom.InstanceState> {
-        return "Stopped"
+        return this._state;
     }
-    public sendCommand(command: string, caused_by: Atom.CausedBy): Promise<void> {
-        throw new Error("Method not implemented.");
+    public async sendCommand(command: string, caused_by: Atom.CausedBy): Promise<void> {
+        this.event_stream.emitConsoleOut(`Got command: ${command}`);
     }
     public monitor(): Promise<Atom.PerformanceReport> {
         throw new Error("Method not implemented.");
@@ -77,7 +96,7 @@ export default class TestInstance extends Atom.AtomInstance {
         throw new Error("Method not implemented.");
     }
     public async name(): Promise<string> {
-        return "test_im_in_ts";
+        return this.config.name;
     }
     public version(): Promise<string> {
         throw new Error("Method not implemented.");
@@ -85,11 +104,11 @@ export default class TestInstance extends Atom.AtomInstance {
     public game(): Promise<Atom.Game> {
         throw new Error("Method not implemented.");
     }
-    public description(): Promise<string> {
-        throw new Error("Method not implemented.");
+    public async description(): Promise<string> {
+        return this.config.description;
     }
-    public port(): Promise<number> {
-        throw new Error("Method not implemented.");
+    public async port(): Promise<number> {
+        return this.config.port;
     }
     public getAutoStart(): Promise<boolean> {
         throw new Error("Method not implemented.");
@@ -97,14 +116,14 @@ export default class TestInstance extends Atom.AtomInstance {
     public getRestartOnCrash(): Promise<boolean> {
         throw new Error("Method not implemented.");
     }
-    public setName(name: string): Promise<void> {
-        throw new Error("Method not implemented.");
+    public async setName(name: string): Promise<void> {
+        this.config.name = name;
     }
-    public setDescription(description: string): Promise<void> {
-        throw new Error("Method not implemented.");
+    public async setDescription(description: string): Promise<void> {
+        this.config.description = description;
     }
-    public setPort(port: number): Promise<void> {
-        throw new Error("Method not implemented.");
+    public async setPort(port: number): Promise<void> {
+        this.config.port = port;
     }
     public setAutoStart(auto_start: boolean): Promise<void> {
         throw new Error("Method not implemented.");
