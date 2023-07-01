@@ -40,8 +40,8 @@ export default class TestInstance extends Atom.AtomInstance {
     public async setup(setupValue: Atom.SetupValue, dotLodestoneConfig: Atom.DotLodestoneConfig, path: string): Promise<void> {
         this.uuid = dotLodestoneConfig.uuid;
         let port: number;
-        if (setupValue.setting_sections["setting_id1"].settings["setting_id1"].value?.type == "UnsignedInteger") {
-            port = setupValue.setting_sections["setting_id1"].settings["setting_id1"].value.value;
+        if (setupValue.setting_sections["section_id1"].settings["setting_id1"].value?.type == "UnsignedInteger") {
+            port = setupValue.setting_sections["section_id1"].settings["setting_id1"].value.value;
         } else {
             throw new Error("Invalid value type");
         }
