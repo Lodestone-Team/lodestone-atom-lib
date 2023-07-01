@@ -43,6 +43,7 @@ export default class TestInstance extends Atom.AtomInstance {
     public async start(caused_by: Atom.CausedBy, block: boolean): Promise<void> {
         console.log("start");
         this.event_stream.emitStateChange("Running");
+        this._state = "Running";
         (async () => {
             while (this._state == "Running") {
                 await new Promise(r => setTimeout(r, 1000));
