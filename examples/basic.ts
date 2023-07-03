@@ -60,8 +60,8 @@ export default class TestInstance extends Atom.AtomInstance {
     }
     public async restore(dotLodestoneConfig: Atom.DotLodestoneConfig, path: string): Promise<void> {
         this.uuid = dotLodestoneConfig.uuid;
-        this.event_stream = new EventStream(this.uuid, this.config.name);
         this.config = JSON.parse(await Deno.readTextFile(path + "/" + TestInstance.restoreConfigName)) as RestoreConfig;
+        this.event_stream = new EventStream(this.uuid, this.config.name);
         return;
     }
     public async start(caused_by: Atom.CausedBy, block: boolean): Promise<void> {
