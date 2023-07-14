@@ -56,6 +56,13 @@ export default class TestInstance extends Atom.AtomInstance {
 
         this.event_stream = new EventStream(this.uuid, this.config.name);
 
+        this.event_stream.instanceCreationProgression(100, async (p) => {
+            for (let i = 0; i < 100; i++) {
+                await new Promise(r => setTimeout(r, 100));
+                p.update(1, `Progress: ${i}%`);
+            }
+        });
+
         return;
     }
     public async restore(dotLodestoneConfig: Atom.DotLodestoneConfig, path: string): Promise<void> {
