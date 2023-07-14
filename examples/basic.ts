@@ -58,7 +58,7 @@ export default class TestInstance extends Atom.AtomInstance {
 
         this.event_stream.instanceCreationProgression(100, async (p) => {
             for (let i = 0; i < 100; i++) {
-                await new Promise(r => setTimeout(r, 100));
+                await new Promise(r => setTimeout(r, 1000));
                 p.update(1, `Progress: ${i}%`);
             }
         });
