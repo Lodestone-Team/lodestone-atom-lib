@@ -1,6 +1,6 @@
 import * as Atom from "https://raw.githubusercontent.com/Lodestone-Team/lodestone-atom-lib/main/mod.ts";
 
-import { EventStream } from "https://raw.githubusercontent.com/Lodestone-Team/lodestone-macro-lib/main/events.ts";
+import { EventStream, ProgressionHandler } from "https://raw.githubusercontent.com/Lodestone-Team/lodestone-macro-lib/main/events.ts";
 interface RestoreConfig {
     name: string;
     description: string;
@@ -37,7 +37,7 @@ export default class TestInstance extends Atom.AtomInstance {
             }
         };
     }
-    public async setup(setupValue: Atom.SetupValue, dotLodestoneConfig: Atom.DotLodestoneConfig, path: string): Promise<void> {
+    public async setup(setupValue: Atom.SetupValue, dotLodestoneConfig: Atom.DotLodestoneConfig, progression_handler: ProgressionHandler, path: string): Promise<void> {
         this.uuid = dotLodestoneConfig.uuid;
         let port: number;
         if (setupValue.setting_sections["section_id1"].settings["setting_id1"].value?.type == "UnsignedInteger") {
@@ -56,12 +56,10 @@ export default class TestInstance extends Atom.AtomInstance {
 
         this.event_stream = new EventStream(this.uuid, this.config.name);
 
-        this.event_stream.instanceCreationProgression(100, async (p) => {
-            for (let i = 0; i < 100; i++) {
-                await new Promise(r => setTimeout(r, 1000));
-                p.update(1, `Progress: ${i}%`);
-            }
-        });
+        for (let i = 0; progression_handler.leftOverProgress() > 0; i++) {
+            progression_handler.update(i, `Doing thing ${i}`);
+            await new Promise(r => setTimeout(r, 200));
+        }
 
         return;
     }
