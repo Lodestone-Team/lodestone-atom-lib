@@ -56,10 +56,17 @@ export default class TestInstance extends Atom.AtomInstance {
 
         this.event_stream = new EventStream(this.uuid, this.config.name);
 
-        for (let i = 0; progression_handler.leftOverProgress() > 0; i++) {
-            progression_handler.update(i, `Doing thing ${i}`);
+        while (progression_handler.leftOverProgress() > 50) {
+            progression_handler.update(1, `Doing something... ${progression_handler.leftOverProgress()} left`);
             await new Promise(r => setTimeout(r, 200));
         }
+
+        while (progression_handler.leftOverProgress() < 100) {
+            progression_handler.update(-1, `Negative ${progression_handler.leftOverProgress()} left`);
+            await new Promise(r => setTimeout(r, 200));
+        }
+
+
 
         return;
     }
