@@ -1,1 +1,1 @@
-export * from "https://raw.githubusercontent.com/Lodestone-Team/lodestone_core/dev/src/implementations/generic/js/main/libs/atom_instance.ts";
+export * from "https://raw.githubusercontent.com/Lodestone-Team/lodestone/dev/core/src/implementations/generic/js/main/libs/atom_instance.ts";
